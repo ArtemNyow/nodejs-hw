@@ -4,7 +4,7 @@ import pino from 'pino-http';
 import 'dotenv/config';
 
 const app = express();
-const PORT = process.env.PORT ?? 3000;
+const PORT = process.env.PORT ?? 3030;
 
 app.use(express.json());
 app.use(cors());
@@ -36,7 +36,7 @@ app.get('/notes', (req, res) => {
 });
 
 app.get('/notes/:noteId', (req, res) => {
-  const noteId = Number(req.params.noteId);
+  const { noteId } = req.params;
   res.status(200).json({ message: `Retrieved note with ID: ${noteId}` });
 });
 
@@ -52,7 +52,6 @@ app.use((err, req, res, next) => {
   console.error('Error:', err.message);
   res.status(500).json({
     message: "Simulated server error",
-    error: err.message,
   });
 });
 
