@@ -27,7 +27,10 @@ const noteSchema = new Schema({
     enum: TAGS,
     default:'Todo'
   },
-  timestamps: true,
+
+},
+{
+   timestamps: true,
 });
 
 const Note = model('Note', noteSchema);
