@@ -1,17 +1,7 @@
 import { Schema,model } from "mongoose";
+import { TAGS } from "../../constants/tags.js";
 
-const TAGS =[
-  'Work',
-  'Personal',
-  'Meeting',
-  'Shopping',
-  'Ideas',
-  'Travel',
-  'Finance',
-  'Health',
-  'Important',
-  'Todo',
-];
+
 
 const noteSchema = new Schema({
   title: {
