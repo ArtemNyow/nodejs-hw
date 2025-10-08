@@ -43,7 +43,7 @@ export const getNoteById = async (req, res,next) => {
   const { noteId } = req.params;
   const note = await Note.findById(noteId);
   if (!note) {
-    next(createHttpError(404, 'Student not found'));
+    next(createHttpError(404, 'Note not found'));
     return;
   }
   res.status(200).json(note);
@@ -62,10 +62,10 @@ export const deleteNote = async (req, res,next) => {
   });
 
    if (!note) {
-    next(createHttpError(404, 'Student not found'));
+    next(createHttpError(404, 'Note not found'));
     return;
   }
-  res.status(200).send(note);
+  res.status(200).json(note);
 };
 
 
@@ -79,7 +79,7 @@ export const updateNote  = async (req, res,next) => {
   );
 
    if (!note) {
-    next(createHttpError(404, 'Student not found'));
+    next(createHttpError(404, 'Note not found'));
     return;
   }
   res.status(200).json(note);
