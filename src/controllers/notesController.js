@@ -1,42 +1,40 @@
 import Note from "../models/note.js";
 import createHttpError from "http-errors";
 
-export const getAllNotes = async (req, res) => {
-
+export const getAllNotes = async (req, res, next) => {
+  try {
     const { tag, search, page = 1, perPage = 10 } = req.query;
     const skip = (page - 1) * perPage;
 
-  const notesQuery = Note.find({userId: req.user._id});
+    const notesQuery = Note.find({ userId: req.user._id });
 
-  if (tag) {
-       notesQuery.where("tag").equals(tag);
-     }
- if (search) {
-      const regex = new RegExp(search, "i");
-      notesQuery.where({
-        $or: [
-          { title: regex },
-          { content: regex }
-        ]
-      });
+    if (tag) {
+      notesQuery.where("tag").equals(tag);
     }
 
-  const [totalNotes, notes] = await Promise.all([
-    notesQuery.clone().countDocuments(),
-    notesQuery.skip(skip).limit(perPage),
-  ]);
+    if (search) {
+      notesQuery.where({ $text: { $search: search } });
+      notesQuery.sort({ score: { $meta: "textScore" } });
+      notesQuery.select({ score: { $meta: "textScore" } });
+    }
 
-  const totalPages = Math.ceil(totalNotes / perPage);
+    const [totalNotes, notes] = await Promise.all([
+      notesQuery.clone().countDocuments(),
+      notesQuery.skip(skip).limit(perPage),
+    ]);
 
+    const totalPages = Math.ceil(totalNotes / perPage);
 
     res.status(200).json({
-      page,
-      perPage,
+      page: Number(page),
+      perPage: Number(perPage),
       totalNotes,
       totalPages,
       notes,
     });
-
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const getNoteById = async (req, res,next) => {

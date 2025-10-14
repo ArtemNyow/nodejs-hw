@@ -27,6 +27,7 @@ const noteSchema = new Schema({
 {
    timestamps: true,
 });
+noteSchema.index({ title: "text", content: "text" });
 
 const Note = model('Note', noteSchema);
 export default Note;
