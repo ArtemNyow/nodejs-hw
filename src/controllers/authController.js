@@ -4,7 +4,10 @@ import User from "../models/user.js";
 import { createSession, setSessionCookies } from "../services/auth.js";
 import {Session} from "../models/session.js";
 import jwt from 'jsonwebtoken';
-import {sendMail} from '../utils/sendMail.js';
+import { sendMail } from '../utils/sendMail.js';
+import path from "path";
+import fs from "fs";
+import handlebars from "handlebars";
 
 export const registerUser = async (req, res, next) => {
   try {
@@ -118,13 +121,22 @@ export const requestResetEmail = async (req, res, next) => {
     process.env.JWT_SECRET,
     { expiresIn: '15m' },
   );
+  const resetLink = `${process.env.FRONTEND_DOMAIN}/reset-password?token=${resetToken}`;
+  const templatePath = path.resolve("src/templates/reset-password-email.html");
+  const source = fs.readFileSync(templatePath, "utf8");
+  const template = handlebars.compile(source);
+
+  const html = template({
+    name: user.username,
+    link: resetLink,
+  });
 
   try {
-    await sendMail({
+      await sendMail({
       from: process.env.SMTP_FROM,
       to: email,
       subject: 'Reset your password',
-      html: `<p>Click <a href="${resetToken}">here</a> to reset your password!</p>`,
+      html,
     });
   } catch {
     next(createHttpError(500, 'Failed to send the email, please try again later.'));
